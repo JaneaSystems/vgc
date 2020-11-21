@@ -10,5 +10,6 @@
 // add headers that you want to pre-compile here
 #include "../vgc-core/imgutil.h"
 #include <vector>
+#include <thread>
 
 #endif //PCH_H
