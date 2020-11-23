@@ -36,5 +36,5 @@ namespace vgc::imgutil
      * Save an image using the Portable Network Graphics format
      * to a given file path.
      */
-    HRESULT SaveImageAsPngW(ImageData img, LPCWSTR path);
+    HRESULT SaveImageAsPngW(ImageData& img, LPCWSTR path);
 }

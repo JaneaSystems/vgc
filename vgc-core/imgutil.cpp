@@ -26,7 +26,7 @@ namespace
 
 namespace vgc::imgutil
 {
-    HRESULT SaveImageAsPngW(ImageData img, LPCWSTR path)
+    HRESULT SaveImageAsPngW(ImageData& img, LPCWSTR path)
     {
         if (!img.buffer.size() || !path)
         {
