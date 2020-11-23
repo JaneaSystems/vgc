@@ -12,11 +12,7 @@ namespace vgccoreunittests
         
         TEST_METHOD(TestSaveImageAsPngW)
         {
-            ImageData img;
-            img.width = 800;
-            img.height = 600;
-            std::vector<BYTE> buffer(img.BufferSize());
-            img.data = buffer.data();
+            ImageData img(800, 600);
 
             for (UINT i = 0; i < img.height; i++)
             {
@@ -43,11 +39,7 @@ namespace vgccoreunittests
             {
                 auto task = [&](size_t taskId)
                 {
-                    ImageData img;
-                    img.width = 800;
-                    img.height = 600;
-                    std::vector<BYTE> buffer(img.BufferSize());
-                    img.data = buffer.data();
+                    ImageData img(800, 600);
 
                     for (UINT i = 0; i < img.height; i++)
                     {

@@ -28,7 +28,7 @@ namespace vgc::imgutil
 {
     HRESULT SaveImageAsPngW(ImageData img, LPCWSTR path)
     {
-        if (!img.data || !path)
+        if (!img.buffer.size() || !path)
         {
             return E_INVALIDARG;
         }
@@ -52,7 +52,7 @@ namespace vgc::imgutil
             CheckResult(frame->Initialize(nullptr));
             CheckResult(frame->SetSize(img.width, img.height));
             CheckResult(frame->SetPixelFormat(&pixelFormat));
-            CheckResult(frame->WritePixels(img.height, img.width * 4, (UINT)img.BufferSize(), img.data));
+            CheckResult(frame->WritePixels(img.height, img.width * 4, (UINT)img.buffer.size(), img.buffer.data()));
             CheckResult(frame->Commit());
             CheckResult(encoder->Commit());
         }
