@@ -2,7 +2,7 @@
 using namespace std;
 using namespace vgc::imgutil;
 
-int main()
+void test_run1()
 {
     ImageData img(2560, 1440);
 
@@ -30,4 +30,28 @@ int main()
 
         gifImg.AddFrame(img, 2);
     }
+
+    ScreenRecorder rec([](auto arg) {});
+}
+
+void test_run2()
+{
+    const int w = 2560, h = 1440;
+    SimpleGifEncoder<SimpleQuantizer> gifImg(L"img.gif", w, h);
+
+    ScreenRecorder rec([&](ImageData& img) {
+        gifImg.AddFrame(img, 3);
+    });
+
+    for (int i = 0; i < 400; i++)
+    {
+        rec.GrabImage();
+        rec.DrawCursor();
+        rec.OutputImage();
+    }
+}
+
+int main()
+{
+    test_run2();
 }
