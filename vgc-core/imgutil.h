@@ -557,7 +557,7 @@ namespace vgc::imgutil
             IDXGIOutput1* dxgiOutput1;
 
             // Which output device should we capture?
-            UINT output = 0;
+            UINT output = 1;
 
             CheckResult(m_device->QueryInterface(IID_PPV_ARGS(&dxgiDevice)));
             CheckResult(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&dxgiAdapter)));
@@ -574,6 +574,10 @@ namespace vgc::imgutil
             SafeRelease(dxgiOutput1);
 
             m_outputDuplication->GetDesc(&m_outputDuplDesc);
+            {
+                auto c = m_outputDesc.DesktopCoordinates;
+                std::cerr << c.left << ' ' << c.top << ' ' << c.right << ' ' << c.bottom << '\n';
+            }
         }
 
         void CreateCPUBuffer()
@@ -642,8 +646,11 @@ namespace vgc::imgutil
             {
                 if (info.flags == CURSOR_SHOWING)
                 {
-                    std::cerr << "Cursor: " << info.ptScreenPos.x << ' ' << info.ptScreenPos.y << '\n';
-                    DrawIconEx(hdc, info.ptScreenPos.x, info.ptScreenPos.y, info.hCursor, 0, 0, 0, 0, DI_NORMAL | DI_DEFAULTSIZE);
+                    LONG cursorX = info.ptScreenPos.x - m_outputDesc.DesktopCoordinates.left;
+                    LONG cursorY = info.ptScreenPos.y - m_outputDesc.DesktopCoordinates.top;
+                    // TODO remove cerr printout
+                    std::cerr << "Cursor: " << cursorX << ' ' << cursorY << '\n';
+                    DrawIconEx(hdc, cursorX, cursorY, info.hCursor, 0, 0, 0, 0, DI_NORMAL | DI_DEFAULTSIZE);
                 }
             }
 

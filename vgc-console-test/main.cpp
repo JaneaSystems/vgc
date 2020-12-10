@@ -1,4 +1,5 @@
 #include "../vgc-core/imgutil.h"
+#include <ShellScalingApi.h>
 using namespace std;
 using namespace vgc::imgutil;
 
@@ -43,7 +44,7 @@ void test_run2()
         gifImg.AddFrame(img, 3);
     });
 
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 100; i++)
     {
         rec.GrabImage();
         rec.DrawCursor();
@@ -53,5 +54,6 @@ void test_run2()
 
 int main()
 {
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
     test_run2();
 }
