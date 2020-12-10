@@ -154,9 +154,9 @@ namespace vgc::imgutil
                 UINT g = img[i][4 * j + 1];
                 UINT r = img[i][4 * j + 2];
 
-                b = (b + 25) / 51;
-                g = (g + 25) / 51;
-                r = (r + 25) / 51;
+                b = (5 * b + 130) >> 8;
+                g = (5 * g + 130) >> 8;
+                r = (5 * r + 130) >> 8;
                 
                 output.pixels[k++] = r * 36 + g * 6 + b + 1;
             }
