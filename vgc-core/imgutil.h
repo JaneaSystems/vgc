@@ -524,6 +524,7 @@ namespace vgc::imgutil
         }
 
         FrameFunc m_frameCallback;
+        UINT m_monitorIndex;
 
         ID3D11Device* m_device{ nullptr };
         ID3D11DeviceContext* m_immediateContext{ nullptr };
@@ -556,14 +557,11 @@ namespace vgc::imgutil
             IDXGIOutput* dxgiOutput;
             IDXGIOutput1* dxgiOutput1;
 
-            // Which output device should we capture?
-            UINT output = 0;
-
             CheckResult(m_device->QueryInterface(IID_PPV_ARGS(&dxgiDevice)));
             CheckResult(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&dxgiAdapter)));
             SafeRelease(dxgiDevice);
 
-            CheckResult(dxgiAdapter->EnumOutputs(output, &dxgiOutput));
+            CheckResult(dxgiAdapter->EnumOutputs(m_monitorIndex, &dxgiOutput));
             SafeRelease(dxgiAdapter);
 
             CheckResult(dxgiOutput->GetDesc(&m_outputDesc));
@@ -681,7 +679,7 @@ namespace vgc::imgutil
             m_immediateContext->Unmap(m_destImage, subresource);
         }
 
-        ScreenRecorder(FrameFunc frameCallback) : m_frameCallback(frameCallback)
+        ScreenRecorder(FrameFunc frameCallback, UINT monitorIndex) : m_frameCallback(frameCallback), m_monitorIndex(monitorIndex)
         {
             m_creationTime = std::chrono::steady_clock::now();
             InitDevices();

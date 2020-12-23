@@ -51,7 +51,7 @@ void test_run2()
         
         lastFrameTime = elapsedTime;
         gifImg.AddFrame(img, frameTime);
-    });
+    }, 0);
 
     using namespace std::chrono;
 
