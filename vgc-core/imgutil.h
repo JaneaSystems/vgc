@@ -1,6 +1,4 @@
 #pragma once
-// TODO add this somewhere in the project settings?
-#pragma comment(lib, "d3d11")
 
 #include <windows.h>
 #include <vector>
@@ -9,6 +7,7 @@
 #include <thread>
 #include <fstream>
 #include <condition_variable>
+#include <chrono>
 #include <d3d11.h>
 #include <dxgi1_2.h>
 
@@ -537,6 +536,7 @@ namespace vgc::imgutil
         DXGI_OUTPUT_DESC m_outputDesc;
         DXGI_OUTDUPL_DESC m_outputDuplDesc;
         DXGI_OUTDUPL_FRAME_INFO m_frameInfo;
+        std::chrono::steady_clock::time_point m_creationTime;
 
         void InitDevices()
         {
@@ -557,7 +557,7 @@ namespace vgc::imgutil
             IDXGIOutput1* dxgiOutput1;
 
             // Which output device should we capture?
-            UINT output = 1;
+            UINT output = 0;
 
             CheckResult(m_device->QueryInterface(IID_PPV_ARGS(&dxgiDevice)));
             CheckResult(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&dxgiAdapter)));
@@ -675,13 +675,15 @@ namespace vgc::imgutil
 
             std::copy(raw, raw + bytes, img.buffer.data());
 
-            m_frameCallback(img);
+            auto elapsedTimeNanoSeconds = (std::chrono::steady_clock::now() - m_creationTime).count();
+            m_frameCallback(img, elapsedTimeNanoSeconds);
 
             m_immediateContext->Unmap(m_destImage, subresource);
         }
 
         ScreenRecorder(FrameFunc frameCallback) : m_frameCallback(frameCallback)
         {
+            m_creationTime = std::chrono::steady_clock::now();
             InitDevices();
             CreateCPUBuffer();
             CreateGDIBuffer();

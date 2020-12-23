@@ -3,6 +3,9 @@
 
 #include "imgutil.h"
 
+// TODO add this somewhere in the project settings?
+#pragma comment(lib, "d3d11")
+
 namespace
 {
     void CheckResult(HRESULT hr)
@@ -38,6 +41,7 @@ namespace vgc::imgutil
         IWICBitmapFrameEncode* frame = nullptr;
         IWICStream* stream = nullptr;
         GUID pixelFormat = GUID_WICPixelFormat32bppBGRA;
+        HRESULT result = S_OK;
 
         try
         {
@@ -57,7 +61,7 @@ namespace vgc::imgutil
         }
         catch (HRESULT hr)
         {
-            return hr;
+            result = hr;
         }
 
         SafeRelease(frame);
@@ -65,7 +69,7 @@ namespace vgc::imgutil
         SafeRelease(stream);
         SafeRelease(factory);
 
-        return S_OK;
+        return result;
     }
 
     HRESULT LoadImageFromPngFileW(ImageData& img, LPCWSTR path)
@@ -81,6 +85,7 @@ namespace vgc::imgutil
         IWICStream* stream = nullptr;
         GUID pixelFormat;
         UINT width, height;
+        HRESULT result = S_OK;
 
         try
         {
@@ -98,7 +103,7 @@ namespace vgc::imgutil
             }
             catch (std::bad_alloc)
             {
-                return E_OUTOFMEMORY;
+                throw E_OUTOFMEMORY;
             }
 
             CheckResult(frame->GetPixelFormat(&pixelFormat));
@@ -112,7 +117,7 @@ namespace vgc::imgutil
         }
         catch (HRESULT hr)
         {
-            return hr;
+            result = hr;
         }
 
         SafeRelease(frame);
@@ -120,7 +125,7 @@ namespace vgc::imgutil
         SafeRelease(stream);
         SafeRelease(factory);
 
-        return S_OK;
+        return result;
     }
 
     QuantizationOutput SimpleQuantizer::operator() (const ImageData& img) const

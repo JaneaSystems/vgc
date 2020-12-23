@@ -40,11 +40,22 @@ void test_run2()
     const int w = 2560, h = 1440;
     SimpleGifEncoder<SimpleQuantizer> gifImg(L"img.gif", w, h);
 
-    ScreenRecorder rec([&](ImageData& img) {
-        gifImg.AddFrame(img, 3);
+    unsigned long long lastFrameTime = 0;
+
+    ScreenRecorder rec([&](ImageData& img, unsigned long long elapsedTime) {
+        auto frameTime = (elapsedTime - lastFrameTime) / 10'000'000;
+        if (frameTime < 2)
+        {
+            return;
+        }
+        
+        lastFrameTime = elapsedTime;
+        gifImg.AddFrame(img, frameTime);
     });
 
-    for (int i = 0; i < 100; i++)
+    using namespace std::chrono;
+
+    for (auto t = steady_clock::now(); (steady_clock::now() - t).count() < 5'000'000'000ull;)
     {
         rec.GrabImage();
         rec.DrawCursor();
