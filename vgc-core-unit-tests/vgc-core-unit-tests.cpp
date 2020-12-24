@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace vgc::imgutil;
+using namespace vgc;
 
 namespace vgccoreunittests
 {

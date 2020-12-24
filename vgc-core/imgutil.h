@@ -1,17 +1,9 @@
 #pragma once
 
-#include <windows.h>
-#include <vector>
-#include <iostream>
-#include <mutex>
-#include <thread>
-#include <fstream>
-#include <condition_variable>
-#include <chrono>
-#include <d3d11.h>
-#include <dxgi1_2.h>
+#include "pch.h"
+#pragma comment(lib, "d3d11")
 
-namespace vgc::imgutil
+namespace vgc
 {
     /*
      * Contains information about an image. Data is organized as a sequence of rows,
@@ -695,10 +687,10 @@ namespace vgc::imgutil
         void OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY)
         {
             D3D11_BOX region;
-            capture.left = max(capture.left, m_outputDesc.DesktopCoordinates.left);
-            capture.right = min(capture.right, m_outputDesc.DesktopCoordinates.right);
-            capture.top = max(capture.top, m_outputDesc.DesktopCoordinates.top);
-            capture.bottom = min(capture.bottom, m_outputDesc.DesktopCoordinates.bottom);
+            capture.left = std::max(capture.left, m_outputDesc.DesktopCoordinates.left);
+            capture.right = std::min(capture.right, m_outputDesc.DesktopCoordinates.right);
+            capture.top = std::max(capture.top, m_outputDesc.DesktopCoordinates.top);
+            capture.bottom = std::min(capture.bottom, m_outputDesc.DesktopCoordinates.bottom);
 
             region.left = capture.left - m_outputDesc.DesktopCoordinates.left;
             region.right = capture.right - m_outputDesc.DesktopCoordinates.left;

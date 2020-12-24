@@ -1,7 +1,6 @@
 #include "../vgc-core/imgutil.h"
-#include <ShellScalingApi.h>
 using namespace std;
-using namespace vgc::imgutil;
+using namespace vgc;
 
 void test_run1()
 {

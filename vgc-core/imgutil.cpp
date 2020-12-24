@@ -1,10 +1,5 @@
-#include <Wincodec.h>
-#include <functional>
-
+#include "pch.h"
 #include "imgutil.h"
-
-// TODO add this somewhere in the project settings?
-#pragma comment(lib, "d3d11")
 
 namespace
 {
@@ -27,7 +22,7 @@ namespace
     }
 }
 
-namespace vgc::imgutil
+namespace vgc
 {
     HRESULT SaveImageAsPngFileW(ImageData& img, LPCWSTR path)
     {
