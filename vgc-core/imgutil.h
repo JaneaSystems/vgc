@@ -497,7 +497,6 @@ namespace vgc::imgutil
 
     // TODO document code below.
 
-    template<class FrameFunc>
     class ScreenRecorder
     {
         static inline const D3D_FEATURE_LEVEL s_featureLevels[] =
@@ -523,7 +522,6 @@ namespace vgc::imgutil
             }
         }
 
-        FrameFunc m_frameCallback;
         UINT m_monitorIndex;
 
         ID3D11Device* m_device{ nullptr };
@@ -538,6 +536,7 @@ namespace vgc::imgutil
         DXGI_OUTDUPL_DESC m_outputDuplDesc;
         DXGI_OUTDUPL_FRAME_INFO m_frameInfo;
         std::chrono::steady_clock::time_point m_creationTime;
+        unsigned long long m_lastFrameTime;
 
         void InitDevices()
         {
@@ -621,11 +620,13 @@ namespace vgc::imgutil
          */
         void GrabImage()
         {
+            SafeRelease(m_desktopImage);
             CheckResult(m_outputDuplication->AcquireNextFrame(INFINITE, &m_frameInfo, &m_desktopResource));
             CheckResult(m_desktopResource->QueryInterface(IID_PPV_ARGS(&m_desktopImage)));
             SafeRelease(m_desktopResource);
             m_immediateContext->CopyResource(m_gdiImage, m_desktopImage);
             CheckResult(m_outputDuplication->ReleaseFrame());
+            m_lastFrameTime = (std::chrono::steady_clock::now() - m_creationTime).count();
         }
 
         /*
@@ -657,9 +658,9 @@ namespace vgc::imgutil
         }
 
         /*
-         * Call the supplied callback function with the image in the GDI buffer as the argument.
+         * Returns the captured image in the GDI buffer
          */
-        void OutputImage()
+        ImageData OutputImage()
         {
             m_immediateContext->CopyResource(m_destImage, m_gdiImage);
             D3D11_MAPPED_SUBRESOURCE resource;
@@ -672,19 +673,68 @@ namespace vgc::imgutil
             ImageData img(resource.RowPitch / 4, bytes / resource.RowPitch);
 
             std::copy(raw, raw + bytes, img.buffer.data());
+            
+            m_immediateContext->Unmap(m_destImage, subresource);
+            return img;
+        }
 
-            auto elapsedTimeNanoSeconds = (std::chrono::steady_clock::now() - m_creationTime).count();
-            m_frameCallback(img, elapsedTimeNanoSeconds);
+        /*
+         * Returns the time when the last frame was captured,
+         * in nanoseconds since the ScreenRecorder was created.
+         */
+        unsigned long long GetLastFrameTime()
+        {
+            return m_lastFrameTime;
+        }
+
+        /*
+         * Copies the specified subregion of the GDI buffer to the given texture resource at the given coordinates.
+         */
+        void OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY)
+        {
+            D3D11_BOX region;
+            region.left = capture.left;
+            region.right = capture.right;
+            region.top = capture.top;
+            region.bottom = capture.bottom;
+            region.front = 0;
+            region.back = 1;
+            m_immediateContext->CopySubresourceRegion(dest, 0, destX, destY, 0, m_gdiImage, 0, &region);
+            m_immediateContext->CopyResource(m_destImage, m_gdiImage);
+            D3D11_MAPPED_SUBRESOURCE resource;
+            UINT subresource = D3D11CalcSubresource(0, 0, 0);
+            CheckResult(m_immediateContext->Map(m_destImage, subresource, D3D11_MAP_READ_WRITE, 0, &resource));
+
+            UINT bytes = resource.DepthPitch;
+            BYTE* raw = reinterpret_cast<BYTE*>(resource.pData);
+
+            std::pair<ImageData, unsigned long long> result{
+                ImageData(resource.RowPitch / 4, bytes / resource.RowPitch),
+                m_lastFrameTime
+            };
+
+            std::copy(raw, raw + bytes, result.first.buffer.data());
 
             m_immediateContext->Unmap(m_destImage, subresource);
         }
 
-        ScreenRecorder(FrameFunc frameCallback, UINT monitorIndex) : m_frameCallback(frameCallback), m_monitorIndex(monitorIndex)
+        ScreenRecorder(UINT monitorIndex) : m_monitorIndex(monitorIndex)
         {
             m_creationTime = std::chrono::steady_clock::now();
             InitDevices();
             CreateCPUBuffer();
             CreateGDIBuffer();
+        }
+
+        ~ScreenRecorder()
+        {
+            SafeRelease(m_desktopImage);
+            SafeRelease(m_gdiImage);
+            SafeRelease(m_destImage);
+            SafeRelease(m_desktopResource);
+            SafeRelease(m_outputDuplication);
+            SafeRelease(m_immediateContext);
+            SafeRelease(m_device);
         }
     };
 }

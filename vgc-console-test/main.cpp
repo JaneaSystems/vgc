@@ -32,7 +32,7 @@ void test_run1()
         gifImg.AddFrame(img, 2);
     }
 
-    ScreenRecorder rec([](auto arg) {}, 0);
+    ScreenRecorder rec(0);
 }
 
 void test_run2()
@@ -42,29 +42,34 @@ void test_run2()
 
     unsigned long long lastFrameTime = 0;
 
-    ScreenRecorder rec([&](ImageData& img, unsigned long long elapsedTime) {
-        auto frameTime = (elapsedTime - lastFrameTime) / 10'000'000;
-        if (frameTime < 2)
-        {
-            return;
-        }
-        
-        lastFrameTime = elapsedTime;
-        gifImg.AddFrame(img, frameTime);
-    }, 0);
+    ScreenRecorder rec(0);
 
     using namespace std::chrono;
 
-    for (auto t = steady_clock::now(); (steady_clock::now() - t).count() < 5'000'000'000ull;)
+    for (auto t = steady_clock::now(); (steady_clock::now() - t).count() < 250'000'000ull;)
     {
         rec.GrabImage();
         rec.DrawCursor();
-        rec.OutputImage();
+        auto img = rec.OutputImage();
+        auto elapsedTime = rec.GetLastFrameTime();
+
+        auto frameTime = (elapsedTime - lastFrameTime) / 10'000'000;
+        if (frameTime < 2)
+        {
+            continue;
+        }
+
+        lastFrameTime += frameTime * 10'000'000;
+        gifImg.AddFrame(img, (USHORT)frameTime);
     }
 }
 
 int main()
 {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    test_run2();
+    for (int i = 0; i < 100; i++)
+    {
+        test_run2();
+    }
+    while (1);
 }
