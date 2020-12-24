@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "../vgc-core/png.h"
+#include "../vgc-core/imgutil.h"
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

@@ -15,3 +15,5 @@
 #include <ShellScalingApi.h>
 #include <Wincodec.h>
 #include <functional>
+
+#include "com-utils.h"

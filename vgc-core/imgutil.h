@@ -33,20 +33,6 @@ namespace vgc
     };
 
     /*
-     * Save an image using the Portable Network Graphics format
-     * to a given file path.
-     */
-    HRESULT SaveImageAsPngFileW(ImageData& img, LPCWSTR path);
-
-    /*
-     * Load an image using the Portable Network Graphics format
-     * from a given file path, and store the result into the given
-     * ImageData object. Should only be used with images saved
-     * using SaveImageAsPngFileW.
-     */
-    HRESULT LoadImageFromPngFileW(ImageData& img, LPCWSTR path);
-
-    /*
      * Bit stream wrapper. Used for capturing the output of compression
      * and for writing the contents of an image to a file. Construct it
      * by passing it a function which takes a BYTE as an argument.
@@ -495,24 +481,6 @@ namespace vgc
         {
             D3D_FEATURE_LEVEL_11_0
         };
-
-        static void CheckResult(HRESULT hr)
-        {
-            if (!SUCCEEDED(hr))
-            {
-                throw hr;
-            }
-        }
-
-        template<class T>
-        static void SafeRelease(T& obj)
-        {
-            if (obj)
-            {
-                obj->Release();
-                obj = nullptr;
-            }
-        }
 
         UINT m_monitorIndex;
 
