@@ -1,4 +1,5 @@
 #include "../vgc-core/imgutil.h"
+#include "../vgc-core/quantization.h"
 using namespace std;
 using namespace vgc;
 

@@ -1,37 +1,12 @@
 #pragma once
 
 #include "pch.h"
+#include "image-data.h"
+#include "quantization.h"
 #pragma comment(lib, "d3d11")
 
 namespace vgc
 {
-    /*
-     * Contains information about an image. Data is organized as a sequence of rows,
-     * top-down. Each row is a sequence of pixels, from the left to the right. Each
-     * pixel consists of 4 bytes, in order, they represent Blue, Green, Red and Alpha
-     * channels.
-     */
-    struct ImageData
-    {
-        UINT width = 0;
-        UINT height = 0;
-        std::vector<BYTE> buffer;
-
-        ImageData(UINT width, UINT height) : width(width), height(height), buffer((size_t)4 * width * height)
-        {
-        }
-
-        BYTE* operator[] (SIZE_T row)
-        {
-            return buffer.data() + row * width * 4;
-        }
-
-        const BYTE* operator[] (SIZE_T row) const
-        {
-            return buffer.data() + row * width * 4;
-        }
-    };
-
     /*
      * Bit stream wrapper. Used for capturing the output of compression
      * and for writing the contents of an image to a file. Construct it
@@ -282,39 +257,6 @@ namespace vgc
         {
             Finish();
         }
-    };
-
-    // TODO document the code below
-
-    /*
-     * Represents one palette entry.
-     */
-    struct PaletteColor
-    {
-        BYTE r, g, b;
-    };
-
-    /*
-     * Represents the output of a quantizer.
-     * The pixels array size must be equal to the number of pixels in the original image.
-     * The pixels must be ordered in the same way as in the original image.
-     * The color code 0 must correspond to the transparent color.
-     * The size of the palette must be equal to pow(2, bitsPerPixel).
-     */
-    struct QuantizationOutput
-    {
-        UINT bitsPerPixel = 8;
-        std::vector<PaletteColor> palette;
-        std::vector<BYTE> pixels;
-        BYTE transparentColor;
-    };
-
-    /*
-     * A simple and very fast quantizer, useful for testing.
-     */
-    struct SimpleQuantizer
-    {
-        QuantizationOutput operator() (const ImageData& img) const;
     };
 
     /*

@@ -81,15 +81,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="com-utils.cpp" />
+    <ClCompile Include="image-data.cpp" />
     <ClCompile Include="imgutil.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="png.cpp" />
+    <ClCompile Include="quantization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="com-utils.h" />
+    <ClInclude Include="image-data.h" />
     <ClInclude Include="imgutil.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="png.h" />
+    <ClInclude Include="quantization.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

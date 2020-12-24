@@ -27,6 +27,12 @@
     <ClCompile Include="com-utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="quantization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image-data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgutil.h">
@@ -39,6 +45,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="com-utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quantization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image-data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
