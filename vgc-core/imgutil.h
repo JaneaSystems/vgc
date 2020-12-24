@@ -689,14 +689,21 @@ namespace vgc::imgutil
 
         /*
          * Copies the specified subregion of the GDI buffer to the given texture resource at the given coordinates.
+         * If the requested capture area goes beyond the edges of the captured screen, it will be shrunk to fit,
+         * and only the shrunk area will be copied.
          */
         void OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY)
         {
             D3D11_BOX region;
-            region.left = capture.left;
-            region.right = capture.right;
-            region.top = capture.top;
-            region.bottom = capture.bottom;
+            capture.left = max(capture.left, m_outputDesc.DesktopCoordinates.left);
+            capture.right = min(capture.right, m_outputDesc.DesktopCoordinates.right);
+            capture.top = max(capture.top, m_outputDesc.DesktopCoordinates.top);
+            capture.bottom = min(capture.bottom, m_outputDesc.DesktopCoordinates.bottom);
+
+            region.left = capture.left - m_outputDesc.DesktopCoordinates.left;
+            region.right = capture.right - m_outputDesc.DesktopCoordinates.left;
+            region.top = capture.top - m_outputDesc.DesktopCoordinates.top;
+            region.bottom = capture.bottom - m_outputDesc.DesktopCoordinates.top;
             region.front = 0;
             region.back = 1;
             m_immediateContext->CopySubresourceRegion(dest, 0, destX, destY, 0, m_gdiImage, 0, &region);
