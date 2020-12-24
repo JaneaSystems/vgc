@@ -700,22 +700,6 @@ namespace vgc::imgutil
             region.front = 0;
             region.back = 1;
             m_immediateContext->CopySubresourceRegion(dest, 0, destX, destY, 0, m_gdiImage, 0, &region);
-            m_immediateContext->CopyResource(m_destImage, m_gdiImage);
-            D3D11_MAPPED_SUBRESOURCE resource;
-            UINT subresource = D3D11CalcSubresource(0, 0, 0);
-            CheckResult(m_immediateContext->Map(m_destImage, subresource, D3D11_MAP_READ_WRITE, 0, &resource));
-
-            UINT bytes = resource.DepthPitch;
-            BYTE* raw = reinterpret_cast<BYTE*>(resource.pData);
-
-            std::pair<ImageData, unsigned long long> result{
-                ImageData(resource.RowPitch / 4, bytes / resource.RowPitch),
-                m_lastFrameTime
-            };
-
-            std::copy(raw, raw + bytes, result.first.buffer.data());
-
-            m_immediateContext->Unmap(m_destImage, subresource);
         }
 
         ScreenRecorder(UINT monitorIndex) : m_monitorIndex(monitorIndex)
