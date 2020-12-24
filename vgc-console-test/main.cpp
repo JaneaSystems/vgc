@@ -32,7 +32,7 @@ void test_run1()
         gifImg.AddFrame(img, 2);
     }
 
-    ScreenRecorder rec([](auto arg) {});
+    ScreenRecorder rec([](auto arg) {}, 0);
 }
 
 void test_run2()
