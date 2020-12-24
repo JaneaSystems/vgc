@@ -657,7 +657,7 @@ namespace vgc::imgutil
         }
 
         /*
-         * Call the supplied callback function with the last captured image as the argument.
+         * Call the supplied callback function with the image in the GDI buffer as the argument.
          */
         void OutputImage()
         {
