@@ -132,8 +132,9 @@ namespace vgc {
 
     ImageData ScreenRecorder::OutputImage()
     {
+        // Using the CPU enabled m_destImage here to avoid creating/deleting CPU texture buffers in TextureToImage
         D3D11::DC()->CopyResource(m_destImage, m_gdiImage);
-        return D3D11::TextureToImage(m_destImage);
+        return D3D11::TextureToImage(m_gdiImage);
     }
 
     unsigned long long ScreenRecorder::GetLastFrameTime()
@@ -178,6 +179,10 @@ namespace vgc {
     ImageData D3D11::TextureToImage(ID3D11Texture2D* texture)
     {
         ID3D11Texture2D* textureCPU = nullptr;
+        D3D11_TEXTURE2D_DESC desc;
+
+        texture->GetDesc(&desc);
+
         D3D11_MAPPED_SUBRESOURCE resource;
         HRESULT hr = DC()->Map(texture, 0, D3D11_MAP_READ_WRITE, 0, &resource);
         bool failed = FAILED(hr);
@@ -202,9 +207,13 @@ namespace vgc {
         UINT bytes = resource.DepthPitch;
         BYTE* raw = reinterpret_cast<BYTE*>(resource.pData);
 
-        ImageData img(resource.RowPitch / 4, bytes / resource.RowPitch);
+        ImageData img(desc.Width, desc.Height);
 
-        std::copy(raw, raw + bytes, img.buffer.data());
+        for (size_t i = 0; i < desc.Height; i++)
+        {
+            auto base = raw + i * resource.RowPitch;
+            std::copy(base, base + 4ull * desc.Width, img[i]);
+        }
 
         if (failed)
         {

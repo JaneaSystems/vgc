@@ -31,7 +31,8 @@ namespace vgc
         static ID3D11DeviceContext* DC();
 
         /*
-         * Converts the given Direct3D texture to an ImageData object.
+         * Converts the given Direct3D texture to an ImageData object. The texture doesn't need
+         * to have CPU access enabled but if it doesn't, there could be a performance penalty.
          */
         static ImageData TextureToImage(ID3D11Texture2D* texture);
 
