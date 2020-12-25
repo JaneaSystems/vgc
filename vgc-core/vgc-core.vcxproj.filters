@@ -36,6 +36,9 @@
     <ClCompile Include="bit-stream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="screen-capture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
