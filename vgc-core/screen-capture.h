@@ -18,10 +18,28 @@ namespace vgc
 
         D3D11();
     public:
-        static ID3D11Device* Device();
-        static ID3D11DeviceContext* DC();
-        static ImageData TextureToImage(ID3D11Texture2D* texture);
         ~D3D11();
+
+        /*
+         * Returns the singleton Direct3D 11 Device.
+         */
+        static ID3D11Device* Device();
+
+        /*
+         * Returns the singleton Direct3D 11 Device Context.
+         */
+        static ID3D11DeviceContext* DC();
+
+        /*
+         * Converts the given Direct3D texture to an ImageData object.
+         */
+        static ImageData TextureToImage(ID3D11Texture2D* texture);
+
+        /*
+         * Creates a new Direct3D texture with given size.
+         * You must free the returned texture after use by calling SafeRelease.
+         */
+        static ID3D11Texture2D* CreateCPUTexture(UINT width, UINT height, DXGI_FORMAT format);
     };
 
     class ScreenRecorder

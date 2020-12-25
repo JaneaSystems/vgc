@@ -73,20 +73,7 @@ namespace vgc {
 
     void ScreenRecorder::CreateCPUBuffer()
     {
-        D3D11_TEXTURE2D_DESC desc;
-        desc.Width = m_outputDuplDesc.ModeDesc.Width;
-        desc.Height = m_outputDuplDesc.ModeDesc.Height;
-        desc.Format = m_outputDuplDesc.ModeDesc.Format;
-        desc.ArraySize = 1;
-        desc.BindFlags = 0;
-        desc.MiscFlags = 0;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
-        desc.MipLevels = 1;
-        desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
-        desc.Usage = D3D11_USAGE_STAGING;
-
-        CheckResult(D3D11::Device()->CreateTexture2D(&desc, NULL, &m_destImage));
+        m_destImage = D3D11::CreateCPUTexture(m_outputDuplDesc.ModeDesc.Width, m_outputDuplDesc.ModeDesc.Height, m_outputDuplDesc.ModeDesc.Format);
     }
 
     void ScreenRecorder::CreateGDIBuffer()
@@ -190,8 +177,27 @@ namespace vgc {
 
     ImageData D3D11::TextureToImage(ID3D11Texture2D* texture)
     {
+        ID3D11Texture2D* textureCPU = nullptr;
         D3D11_MAPPED_SUBRESOURCE resource;
-        CheckResult(DC()->Map(texture, 0, D3D11_MAP_READ_WRITE, 0, &resource));
+        HRESULT hr = DC()->Map(texture, 0, D3D11_MAP_READ_WRITE, 0, &resource);
+        bool failed = FAILED(hr);
+
+        if (failed)
+        {
+            // Try again, first copying the texture to a CPU enabled one.
+            D3D11_TEXTURE2D_DESC textureDesc;
+            texture->GetDesc(&textureDesc);
+            textureCPU = CreateCPUTexture(textureDesc.Width, textureDesc.Height, textureDesc.Format);
+            DC()->CopyResource(textureCPU, texture);
+            hr = DC()->Map(textureCPU, 0, D3D11_MAP_READ_WRITE, 0, &resource);
+
+            if (FAILED(hr))
+            {
+                // Something's failing, give up
+                SafeRelease(textureCPU);
+                throw hr;
+            }
+        }
 
         UINT bytes = resource.DepthPitch;
         BYTE* raw = reinterpret_cast<BYTE*>(resource.pData);
@@ -200,7 +206,36 @@ namespace vgc {
 
         std::copy(raw, raw + bytes, img.buffer.data());
 
-        DC()->Unmap(texture, 0);
+        if (failed)
+        {
+            DC()->Unmap(textureCPU, 0);
+            SafeRelease(textureCPU);
+        }
+        else
+        {
+            DC()->Unmap(texture, 0);
+        }
         return img;
+    }
+
+    ID3D11Texture2D* D3D11::CreateCPUTexture(UINT width, UINT height, DXGI_FORMAT format)
+    {
+        ID3D11Texture2D* texture;
+        D3D11_TEXTURE2D_DESC desc;
+
+        desc.Width = width;
+        desc.Height = height;
+        desc.Format = format;
+        desc.ArraySize = 1;
+        desc.BindFlags = 0;
+        desc.MiscFlags = 0;
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+        desc.MipLevels = 1;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+        desc.Usage = D3D11_USAGE_STAGING;
+
+        CheckResult(D3D11::Device()->CreateTexture2D(&desc, NULL, &texture));
+        return texture;
     }
 }
