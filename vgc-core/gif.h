@@ -1,5 +1,11 @@
 #pragma once
 
+#include "pch.h"
+#include "bit-stream.h"
+#include "image-data.h"
+#include "quantization.h"
+#include "lzw.h"
+
 namespace vgc
 {
     /*

@@ -1,11 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include "image-data.h"
-#include "quantization.h"
-#include "bit-stream.h"
-#include "lzw.h"
-#include "gif.h"
+
 #pragma comment(lib, "d3d11")
 
 namespace vgc
@@ -170,7 +166,7 @@ namespace vgc
             ImageData img(resource.RowPitch / 4, bytes / resource.RowPitch);
 
             std::copy(raw, raw + bytes, img.buffer.data());
-            
+
             m_immediateContext->Unmap(m_destImage, subresource);
             return img;
         }

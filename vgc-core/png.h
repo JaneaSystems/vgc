@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include "imgutil.h"
+#include "image-data.h"
 
 namespace vgc
 {

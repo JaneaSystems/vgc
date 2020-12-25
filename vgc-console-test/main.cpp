@@ -1,4 +1,5 @@
-#include "../vgc-core/imgutil.h"
+#include "../vgc-core/gif.h"
+#include "../vgc-core/screen-capture.h"
 #include "../vgc-core/quantization.h"
 using namespace std;
 using namespace vgc;
@@ -68,5 +69,4 @@ int main()
 {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
     test_run2();
-    while (1);
 }

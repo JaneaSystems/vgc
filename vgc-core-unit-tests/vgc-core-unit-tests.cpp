@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "../vgc-core/png.h"
-#include "../vgc-core/imgutil.h"
+#include "../vgc-core/gif.h"
 #include "../vgc-core/quantization.h"
 #include "CppUnitTest.h"
 
