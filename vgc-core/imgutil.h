@@ -112,21 +112,7 @@ namespace vgc
             // Bits per pixel, initialize the encoder/decoder
             m_bitStream << (BYTE)(quantization.bitsPerPixel);
             
-            // TODO: Reduce memory usage by flushing each chunk when it reaches 255 bytes.
-
-            std::vector<BYTE> lzwOutput;
-            BitStream chunkBitStream([&](BYTE b) { lzwOutput.push_back(b); });
-
-            // Compress the pixel sequence and write it out
-            LZW lzw([&](UINT num, UINT bits) { chunkBitStream.WriteBits(num, bits); }, quantization.bitsPerPixel);
-
-            for (auto pixel : quantization.pixels)
-            {
-                lzw += pixel;
-            }
-
-            lzw.Finish();
-            chunkBitStream.Flush();
+            std::vector<BYTE> lzwOutput = CompressLZW(quantization.pixels, quantization.bitsPerPixel);
 
             // Write out the chunks
             for (size_t i = 0; i < lzwOutput.size();)

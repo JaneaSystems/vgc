@@ -163,4 +163,6 @@ namespace vgc
             Finish();
         }
     };
+
+    std::vector<BYTE> CompressLZW(const std::vector<BYTE>& inBytes, UINT bitDepth);
 }

@@ -33,6 +33,9 @@
     <ClCompile Include="image-data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lzw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgutil.h">

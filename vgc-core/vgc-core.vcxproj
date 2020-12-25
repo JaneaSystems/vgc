@@ -83,6 +83,7 @@
     <ClCompile Include="com-utils.cpp" />
     <ClCompile Include="image-data.cpp" />
     <ClCompile Include="imgutil.cpp" />
+    <ClCompile Include="lzw.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="png.cpp" />
     <ClCompile Include="quantization.cpp" />
