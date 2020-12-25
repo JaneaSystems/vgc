@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="bit-stream.h" />
     <ClInclude Include="com-utils.h" />
+    <ClInclude Include="gif.h" />
     <ClInclude Include="image-data.h" />
     <ClInclude Include="imgutil.h" />
     <ClInclude Include="lzw.h" />
