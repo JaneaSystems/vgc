@@ -88,9 +88,11 @@
     <ClCompile Include="quantization.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bit-stream.h" />
     <ClInclude Include="com-utils.h" />
     <ClInclude Include="image-data.h" />
     <ClInclude Include="imgutil.h" />
+    <ClInclude Include="lzw.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="png.h" />
     <ClInclude Include="quantization.h" />

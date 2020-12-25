@@ -53,5 +53,11 @@
     <ClInclude Include="image-data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lzw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bit-stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
