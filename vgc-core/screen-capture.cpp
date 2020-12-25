@@ -145,9 +145,20 @@ namespace vgc {
     void ScreenRecorder::OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY)
     {
         D3D11_BOX region;
-        capture.left = std::max(capture.left, m_outputDesc.DesktopCoordinates.left);
+
+        if (m_outputDesc.DesktopCoordinates.left > capture.left)
+        {
+            destX += m_outputDesc.DesktopCoordinates.left - capture.left;
+            capture.left = m_outputDesc.DesktopCoordinates.left;
+        }
+
+        if (m_outputDesc.DesktopCoordinates.top > capture.top)
+        {
+            destY += m_outputDesc.DesktopCoordinates.top - capture.top;
+            capture.top = m_outputDesc.DesktopCoordinates.top;
+        }
+
         capture.right = std::min(capture.right, m_outputDesc.DesktopCoordinates.right);
-        capture.top = std::max(capture.top, m_outputDesc.DesktopCoordinates.top);
         capture.bottom = std::min(capture.bottom, m_outputDesc.DesktopCoordinates.bottom);
 
         region.left = capture.left - m_outputDesc.DesktopCoordinates.left;

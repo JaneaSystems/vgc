@@ -96,8 +96,45 @@ void test_run3()
     }
 }
 
+void test_run4()
+{
+    const int w = 800, h = 400, left = 2300, top = 600;
+    SimpleGifEncoder<SimpleQuantizer> gifImg(L"img.gif", w, h);
+
+    unsigned long long lastFrameTime = 0;
+
+    ScreenRecorder rec0(0);
+    ScreenRecorder rec1(1);
+
+    auto texture = D3D11::CreateCPUTexture(w, h, DXGI_FORMAT_B8G8R8A8_UNORM);
+
+    using namespace std::chrono;
+
+    for (auto t = steady_clock::now(); (steady_clock::now() - t).count() < 5'000'000'000ull;)
+    {
+        rec0.GrabImage();
+        rec1.GrabImage();
+        rec0.DrawCursor();
+        rec1.DrawCursor();
+
+        rec0.OutputSubregion(texture, RECT{ .left = left, .top = top, .right = left + w, .bottom = top + h }, 0, 0);
+        rec1.OutputSubregion(texture, RECT{ .left = left, .top = top, .right = left + w, .bottom = top + h }, 0, 0);
+
+        auto elapsedTime = rec0.GetLastFrameTime();
+
+        auto frameTime = (elapsedTime - lastFrameTime) / 10'000'000;
+        if (frameTime < 2)
+        {
+            continue;
+        }
+
+        lastFrameTime += frameTime * 10'000'000;
+        gifImg.AddFrame(D3D11::TextureToImage(texture), (USHORT)frameTime);
+    }
+}
+
 int main()
 {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    test_run3();
+    test_run4();
 }
