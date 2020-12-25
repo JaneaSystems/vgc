@@ -20,6 +20,7 @@ namespace vgc
     public:
         static ID3D11Device* Device();
         static ID3D11DeviceContext* DC();
+        static ImageData TextureToImage(ID3D11Texture2D* texture);
         ~D3D11();
     };
 

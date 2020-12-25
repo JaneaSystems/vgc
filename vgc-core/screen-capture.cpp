@@ -10,6 +10,8 @@ namespace vgc {
 
     D3D11::D3D11()
     {
+        m_device = nullptr;
+        m_deviceContext = nullptr;
         CheckResult(D3D11CreateDevice(
             NULL,
             D3D_DRIVER_TYPE_HARDWARE,
@@ -144,19 +146,7 @@ namespace vgc {
     ImageData ScreenRecorder::OutputImage()
     {
         D3D11::DC()->CopyResource(m_destImage, m_gdiImage);
-        D3D11_MAPPED_SUBRESOURCE resource;
-        UINT subresource = D3D11CalcSubresource(0, 0, 0);
-        CheckResult(D3D11::DC()->Map(m_destImage, subresource, D3D11_MAP_READ_WRITE, 0, &resource));
-
-        UINT bytes = resource.DepthPitch;
-        BYTE* raw = reinterpret_cast<BYTE*>(resource.pData);
-
-        ImageData img(resource.RowPitch / 4, bytes / resource.RowPitch);
-
-        std::copy(raw, raw + bytes, img.buffer.data());
-
-        D3D11::DC()->Unmap(m_destImage, subresource);
-        return img;
+        return D3D11::TextureToImage(m_destImage);
     }
 
     unsigned long long ScreenRecorder::GetLastFrameTime()
@@ -196,5 +186,21 @@ namespace vgc {
         SafeRelease(m_destImage);
         SafeRelease(m_desktopResource);
         SafeRelease(m_outputDuplication);
+    }
+
+    ImageData D3D11::TextureToImage(ID3D11Texture2D* texture)
+    {
+        D3D11_MAPPED_SUBRESOURCE resource;
+        CheckResult(DC()->Map(texture, 0, D3D11_MAP_READ_WRITE, 0, &resource));
+
+        UINT bytes = resource.DepthPitch;
+        BYTE* raw = reinterpret_cast<BYTE*>(resource.pData);
+
+        ImageData img(resource.RowPitch / 4, bytes / resource.RowPitch);
+
+        std::copy(raw, raw + bytes, img.buffer.data());
+
+        DC()->Unmap(texture, 0);
+        return img;
     }
 }
