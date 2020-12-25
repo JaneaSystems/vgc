@@ -96,4 +96,6 @@ namespace vgc
             return *this;
         }
     };
+
+    void InsertByteLengthHeaders(std::vector<BYTE>& bytes);
 }

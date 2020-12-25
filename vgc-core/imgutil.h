@@ -113,20 +113,8 @@ namespace vgc
             m_bitStream << (BYTE)(quantization.bitsPerPixel);
             
             std::vector<BYTE> lzwOutput = CompressLZW(quantization.pixels, quantization.bitsPerPixel);
-
-            // Write out the chunks
-            for (size_t i = 0; i < lzwOutput.size();)
-            {
-                BYTE len = 255;
-                if (lzwOutput.size() - i < 255)
-                {
-                    len = (BYTE)(lzwOutput.size() - i);
-                }
-                m_bitStream << len;
-                m_fileStream.write(reinterpret_cast<char*>(lzwOutput.data() + i), len);
-                i += len;
-            }
-
+            InsertByteLengthHeaders(lzwOutput);
+            m_fileStream.write(reinterpret_cast<char*>(lzwOutput.data()), lzwOutput.size());
             m_bitStream << '\0';
         }
 

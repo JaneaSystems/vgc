@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "lzw.h"
 
 namespace vgc {
