@@ -131,6 +131,8 @@ void test_run4()
         lastFrameTime += frameTime * 10'000'000;
         gifImg.AddFrame(D3D11::TextureToImage(texture), (USHORT)frameTime);
     }
+
+    SafeRelease(texture);
 }
 
 int main()
