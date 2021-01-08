@@ -94,6 +94,11 @@ namespace vgc {
         CheckResult(D3D11::Device()->CreateTexture2D(&desc, NULL, &m_gdiImage));
     }
 
+    Timestamp ScreenCapture::GetTime()
+    {
+        return (std::chrono::steady_clock::now() - m_creationTime).count();
+    }
+
     void ScreenCapture::GrabImage()
     {
         SafeRelease(m_desktopImage);
@@ -102,7 +107,7 @@ namespace vgc {
         SafeRelease(m_desktopResource);
         D3D11::DC()->CopyResource(m_gdiImage, m_desktopImage);
         CheckResult(m_outputDuplication->ReleaseFrame());
-        m_lastFrameTime = (std::chrono::steady_clock::now() - m_creationTime).count();
+        m_lastFrameTime = GetTime();
     }
 
     void ScreenCapture::DrawCursor()
@@ -137,7 +142,7 @@ namespace vgc {
         return D3D11::TextureToImage(m_gdiImage);
     }
 
-    unsigned long long ScreenCapture::GetLastFrameTime()
+    Timestamp ScreenCapture::GetLastFrameTime()
     {
         return m_lastFrameTime;
     }

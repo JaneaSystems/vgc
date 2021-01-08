@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClCompile Include="bit-stream.cpp" />
     <ClCompile Include="com-utils.cpp" />
+    <ClCompile Include="gif.cpp" />
     <ClCompile Include="image-data.cpp" />
     <ClCompile Include="lzw.cpp" />
     <ClCompile Include="pch.cpp" />

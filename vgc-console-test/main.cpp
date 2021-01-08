@@ -142,7 +142,7 @@ void test_run5()
     // Test run of the recorder
     const int w = 1280, h = 720, left = 1280, top = 720;
 
-    PrimaryScreenRecorder recorder(RECT{ .left = left, .top = top, .right = left + w, .bottom = top + h });
+    PrimaryScreenRecorder recorder(RECT{ .left = left, .top = top, .right = left + w, .bottom = top + h }, 15.0);
 
     recorder.Start();
     Sleep(25000);

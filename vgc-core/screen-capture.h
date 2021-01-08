@@ -57,12 +57,18 @@ namespace vgc
         DXGI_OUTDUPL_DESC m_outputDuplDesc;
         DXGI_OUTDUPL_FRAME_INFO m_frameInfo;
         std::chrono::steady_clock::time_point m_creationTime;
-        unsigned long long m_lastFrameTime;
+        Timestamp m_lastFrameTime;
 
         void InitDevices();
         void CreateCPUBuffer();
         void CreateGDIBuffer();
+
     public:
+
+        /*
+         * Returns the time since the ScreenCapture object was created, in nanoseconds.
+         */
+        Timestamp GetTime();
 
         /*
          * Capture the current screen contents and copy the output to the GDI buffer.
@@ -81,9 +87,9 @@ namespace vgc
 
         /*
          * Returns the time when the last frame was captured,
-         * in nanoseconds since the ScreenCapture was created.
+         * in nanoseconds since the ScreenCapture object was created.
          */
-        unsigned long long GetLastFrameTime();
+        Timestamp GetLastFrameTime();
 
         /*
          * Copies the specified subregion of the GDI buffer to the given texture resource at the given coordinates.

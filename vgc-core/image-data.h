@@ -4,6 +4,8 @@
 
 namespace vgc
 {
+    typedef unsigned long long Timestamp;
+
     /*
      * Contains information about an image. Data is organized as a sequence of rows,
      * top-down. Each row is a sequence of pixels, from the left to the right. Each

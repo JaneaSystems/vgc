@@ -2,7 +2,7 @@
 
 namespace vgc
 {
-	void PrimaryScreenRecorder::PersistImage(int frameIdx, ImageData& image)
+	void PrimaryScreenRecorder::PersistImage(ImageData& image)
 	{
 		// This was done to avoid copies of ImageData
 		// Very explicit lifetime control is needed.
@@ -28,7 +28,7 @@ namespace vgc
 			return std::wstring(fileNameBuffer);
 		};
 
-		m_persistFileNames[frameIdx] = std::async(task);
+		m_persistFileNames.push_back(std::async(task));
 	}
 
 	void PrimaryScreenRecorder::SaveFrame()
@@ -36,9 +36,9 @@ namespace vgc
 		m_screenCapture.DrawCursor();
 		m_screenCapture.OutputSubregion(m_texture, m_area, 0, 0);
 		auto image = D3D11::TextureToImage(m_texture);
-		std::cerr << "Saving frame " << m_framesCaptured << '\n';
-		PersistImage(m_framesCaptured, image);
-		m_framesCaptured += 1;
+		std::cerr << "Saving frame " << m_frameTimestamps.size() << '\n';
+		PersistImage(image);
+		m_frameTimestamps.emplace_back(m_screenCapture.GetLastFrameTime());
 	}
 
 	void PrimaryScreenRecorder::Worker()
@@ -55,7 +55,7 @@ namespace vgc
 
 			m_screenCapture.GrabImage();
 
-			if (m_framesCaptured == 0)
+			if (m_frameTimestamps.empty())
 			{
 				// First frame
 				m_recordingStartTime = m_screenCapture.GetLastFrameTime();
@@ -63,8 +63,9 @@ namespace vgc
 			}
 			else
 			{
-				double minimumFrameTimestamp = m_framesCaptured * 1e9 / m_fpsLimit + m_recordingStartTime;
-				if (m_screenCapture.GetLastFrameTime() >= minimumFrameTimestamp)
+				double minimumFrameTimestamp = m_frameTimestamps.size() * 1e9 / m_fpsLimit + m_recordingStartTime;
+				auto lastFrameTime = m_screenCapture.GetLastFrameTime();
+				if (lastFrameTime >= minimumFrameTimestamp)
 				{
 					SaveFrame();
 				}
@@ -74,11 +75,11 @@ namespace vgc
 
 	PrimaryScreenRecorder::PrimaryScreenRecorder(RECT area, double fpsLimit) :
 		m_area(area),
-		m_framesCaptured(0),
 		m_screenCapture(0),
 		m_state(Idle),
 		m_recordingStartTime(-1),
-		m_fpsLimit(fpsLimit)
+		m_fpsLimit(fpsLimit),
+		m_stopTime(0)
 	{
 		m_texture = D3D11::CreateCPUTexture(area.right - area.left, area.bottom - area.top, m_screenCapture.GetPixelFormat());
 		m_worker = std::thread([&]() { Worker(); });
@@ -98,6 +99,9 @@ namespace vgc
 		if (m_state == Recording)
 		{
 			m_state = Stopped;
+
+			std::unique_lock lock(m_mutex);
+			m_stopTime = m_screenCapture.GetTime();
 		}
 	}
 
@@ -108,13 +112,23 @@ namespace vgc
 
 		SimpleGifEncoder<SimpleQuantizer> gif(filePath, m_area.right - m_area.left, m_area.bottom - m_area.top);
 
-		for (auto& [idx, future] : m_persistFileNames)
+		auto delays = TimestampsToGifDelays(m_frameTimestamps, m_stopTime);
+
+		for (size_t i = 0; i < m_persistFileNames.size(); i++)
 		{
-			auto fileName = future.get();
-			ImageData img(0, 0);
-			auto image = LoadImageFromPngFileW(img, fileName.c_str());
-			std::wcerr << idx << L" -> " << fileName << L"\n";
-			gif.AddFrame(img, 2);
+			auto fileName = m_persistFileNames[i].get();
+			if (delays[i] > 0)
+			{
+				ImageData img(0, 0);
+				auto image = LoadImageFromPngFileW(img, fileName.c_str());
+				std::wcerr << i << L" -> " << fileName << L"\n";
+				gif.AddFrame(img, delays[i]);
+			}
+			else
+			{
+				std::cerr << "Skipped frame " << i << '\n';
+			}
+			
 			DeleteFileW(fileName.c_str());
 		}
 	}
