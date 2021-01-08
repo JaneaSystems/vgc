@@ -138,5 +138,6 @@ namespace vgc
         }
     };
 
+    // TODO doc this
     std::vector<USHORT> TimestampsToGifDelays(const std::vector<Timestamp>& timestamps, Timestamp stopTime);
 }
