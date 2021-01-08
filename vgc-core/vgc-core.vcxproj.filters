@@ -39,6 +39,9 @@
     <ClCompile Include="screen-capture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="recorder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="screen-capture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="recorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

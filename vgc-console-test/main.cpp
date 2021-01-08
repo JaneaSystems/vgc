@@ -1,5 +1,5 @@
 #include "../vgc-core/gif.h"
-#include "../vgc-core/screen-capture.h"
+#include "../vgc-core/recorder.h"
 #include "../vgc-core/quantization.h"
 using namespace std;
 using namespace vgc;
@@ -33,7 +33,7 @@ void test_run1()
         gifImg.AddFrame(img, 2);
     }
 
-    ScreenRecorder rec(0);
+    ScreenCapture rec(0);
 }
 
 void test_run2()
@@ -43,7 +43,7 @@ void test_run2()
 
     unsigned long long lastFrameTime = 0;
 
-    ScreenRecorder rec(0);
+    ScreenCapture rec(0);
 
     using namespace std::chrono;
 
@@ -72,7 +72,7 @@ void test_run3()
 
     unsigned long long lastFrameTime = 0;
 
-    ScreenRecorder rec(0);
+    ScreenCapture rec(0);
 
     auto texture = D3D11::CreateCPUTexture(w, h, DXGI_FORMAT_B8G8R8A8_UNORM);
 
@@ -98,13 +98,15 @@ void test_run3()
 
 void test_run4()
 {
-    const int w = 800, h = 400, left = 2300, top = 600;
+    // An example of how to record multiple screens.
+
+    const int w = 4920, h = 1240, left = 100, top = 100;
     SimpleGifEncoder<SimpleQuantizer> gifImg(L"img.gif", w, h);
 
     unsigned long long lastFrameTime = 0;
 
-    ScreenRecorder rec0(0);
-    ScreenRecorder rec1(1);
+    ScreenCapture rec0(0);
+    ScreenCapture rec1(1);
 
     auto texture = D3D11::CreateCPUTexture(w, h, DXGI_FORMAT_B8G8R8A8_UNORM);
 
@@ -135,8 +137,22 @@ void test_run4()
     SafeRelease(texture);
 }
 
+void test_run5()
+{
+    // Test run of the recorder
+    const int w = 1280, h = 720, left = 1280, top = 720;
+
+    PrimaryScreenRecorder recorder(RECT{ .left = left, .top = top, .right = left + w, .bottom = top + h });
+
+    recorder.Start();
+    Sleep(25000);
+    recorder.Stop();
+    recorder.ExportToGif(L"img.gif");
+    Sleep(1000);
+}
+
 int main()
 {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    test_run4();
+    test_run5();
 }

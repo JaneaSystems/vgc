@@ -41,7 +41,7 @@ namespace vgc {
         SafeRelease(m_device);
     }
 
-    void ScreenRecorder::InitDevices()
+    void ScreenCapture::InitDevices()
     {
         IDXGIDevice* dxgiDevice;
         IDXGIAdapter* dxgiAdapter;
@@ -71,12 +71,12 @@ namespace vgc {
         }
     }
 
-    void ScreenRecorder::CreateCPUBuffer()
+    void ScreenCapture::CreateCPUBuffer()
     {
         m_destImage = D3D11::CreateCPUTexture(m_outputDuplDesc.ModeDesc.Width, m_outputDuplDesc.ModeDesc.Height, m_outputDuplDesc.ModeDesc.Format);
     }
 
-    void ScreenRecorder::CreateGDIBuffer()
+    void ScreenCapture::CreateGDIBuffer()
     {
         D3D11_TEXTURE2D_DESC desc;
         desc.Width = m_outputDuplDesc.ModeDesc.Width;
@@ -94,7 +94,7 @@ namespace vgc {
         CheckResult(D3D11::Device()->CreateTexture2D(&desc, NULL, &m_gdiImage));
     }
 
-    void ScreenRecorder::GrabImage()
+    void ScreenCapture::GrabImage()
     {
         SafeRelease(m_desktopImage);
         CheckResult(m_outputDuplication->AcquireNextFrame(INFINITE, &m_frameInfo, &m_desktopResource));
@@ -105,7 +105,7 @@ namespace vgc {
         m_lastFrameTime = (std::chrono::steady_clock::now() - m_creationTime).count();
     }
 
-    void ScreenRecorder::DrawCursor()
+    void ScreenCapture::DrawCursor()
     {
         IDXGISurface1* dxgiSurface1;
         HDC hdc;
@@ -130,19 +130,19 @@ namespace vgc {
         SafeRelease(dxgiSurface1);
     }
 
-    ImageData ScreenRecorder::OutputImage()
+    ImageData ScreenCapture::OutputImage()
     {
         // Using the CPU enabled m_destImage here to avoid creating/deleting CPU texture buffers in TextureToImage
         D3D11::DC()->CopyResource(m_destImage, m_gdiImage);
         return D3D11::TextureToImage(m_gdiImage);
     }
 
-    unsigned long long ScreenRecorder::GetLastFrameTime()
+    unsigned long long ScreenCapture::GetLastFrameTime()
     {
         return m_lastFrameTime;
     }
 
-    void ScreenRecorder::OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY)
+    void ScreenCapture::OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY)
     {
         D3D11_BOX region;
 
@@ -170,7 +170,12 @@ namespace vgc {
         D3D11::DC()->CopySubresourceRegion(dest, 0, destX, destY, 0, m_gdiImage, 0, &region);
     }
 
-    ScreenRecorder::ScreenRecorder(UINT monitorIndex) : m_monitorIndex(monitorIndex)
+    DXGI_FORMAT ScreenCapture::GetPixelFormat()
+    {
+        return m_outputDuplDesc.ModeDesc.Format;
+    }
+
+    ScreenCapture::ScreenCapture(UINT monitorIndex) : m_monitorIndex(monitorIndex)
     {
         m_creationTime = std::chrono::steady_clock::now();
         InitDevices();
@@ -178,7 +183,7 @@ namespace vgc {
         CreateGDIBuffer();
     }
 
-    ScreenRecorder::~ScreenRecorder()
+    ScreenCapture::~ScreenCapture()
     {
         SafeRelease(m_desktopImage);
         SafeRelease(m_gdiImage);

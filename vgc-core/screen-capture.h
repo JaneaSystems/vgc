@@ -43,7 +43,7 @@ namespace vgc
         static ID3D11Texture2D* CreateCPUTexture(UINT width, UINT height, DXGI_FORMAT format);
     };
 
-    class ScreenRecorder
+    class ScreenCapture
     {
         UINT m_monitorIndex;
 
@@ -81,7 +81,7 @@ namespace vgc
 
         /*
          * Returns the time when the last frame was captured,
-         * in nanoseconds since the ScreenRecorder was created.
+         * in nanoseconds since the ScreenCapture was created.
          */
         unsigned long long GetLastFrameTime();
 
@@ -92,8 +92,13 @@ namespace vgc
          */
         void OutputSubregion(ID3D11Texture2D* dest, RECT capture, LONG destX, LONG destY);
 
-        ScreenRecorder(UINT monitorIndex);
+        /*
+         * Returns the pixel format acquired by DirectX output duplication
+         */
+        DXGI_FORMAT GetPixelFormat();
 
-        ~ScreenRecorder();
+        ScreenCapture(UINT monitorIndex);
+
+        ~ScreenCapture();
     };
 }
